@@ -2,8 +2,8 @@ import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { Request } from 'express';
 
 import { AuthenticationService, Token } from './authentication.service';
-import { SignUpUserDto } from './dto/sign-up-user.dto';
-import { LocalAuthGuard } from './local-auth.guard';
+import { SignUpUserDto } from './dto';
+import { LocalAuthGuard } from './guards';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -36,4 +36,11 @@ export class AuthenticationController {
     */
     return this.authenticationService.login(req.user);
   }
+
+  // example of protected routes:
+  // @UseGuards(JwtAuthGuard)
+  // @Get('profile')
+  // getProfile(@Req() req: Request) {
+  //   return req.user;
+  // }
 }

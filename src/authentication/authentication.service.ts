@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { SignUpUserDto } from './dto/sign-up-user.dto';
+import { SignUpUserDto } from './dto';
 
 export type Token = {
   access_token: string;

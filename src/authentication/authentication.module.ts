@@ -5,12 +5,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
 import { UsersModule } from 'src/users/users.module';
-import { LocalStrategy } from './local.strategy';
+import { LocalStrategy, JwtStrategy } from './strategies';
 import { jwtConstants } from './constants';
 
 @Module({
   // here we put the service associated with our module
-  providers: [AuthenticationService, LocalStrategy],
+  providers: [AuthenticationService, LocalStrategy, JwtStrategy],
   // here we put dependencies (in the form of modules) of our module
   // for instance, our AuthenticationService (which is inside our AuthenticationModule) uses the UsersService
   // hence, it depends on it, so we should add it in the imports array
