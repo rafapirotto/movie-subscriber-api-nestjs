@@ -8,7 +8,7 @@ import { UsersService } from './users.service';
   // the following line of code is what creates the repository for us:
   imports: [TypeOrmModule.forFeature([User])],
   providers: [UsersService],
-  // since AuthenticationService uses the UsersService, we need to export it
+  // since AuthenticationService uses the UsersService (UsersService is used by the AuthenticationService), we need to export it
   // so that we make it available for the AuthenticationService
   exports: [UsersService],
 })

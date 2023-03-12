@@ -13,7 +13,16 @@ export class UsersService {
     return this.repository.save(user);
   }
 
+  // nota: el this.repository.findOne toma en cuenta si los users fueron borrados (se fija en la columna deletedAt)
+  // osea que si llamo al findOne de un user que fue borrado, me devuelve null
+  // otra cosa, para borrar un user, lo hago con el this.repository.softRemove()
   findByEmail(email: string): Promise<User> {
+    // para incluir los que fueron borrados con el soft remove:
+    // const result = await this.repo.find({ where: { id }, withDeleted: true })
+    // para recuperar algo que borre con el softRemove:
+    // await this.repository.recover({
+    //   id: 'someId',
+    // });
     return this.repository.findOne({ where: { email } });
   }
 
