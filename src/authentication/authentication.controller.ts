@@ -17,7 +17,6 @@ export class AuthenticationController {
   // esta auth guard es la que crea el req.user.
   // esto se hace solo si el metodo validate() devuelve algo que no sea null.
   // si devuelve null, entonces no se llama al metodo de abajo (this.authenticationService.login(req.user))
-
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@Req() req: Request) {
@@ -36,11 +35,4 @@ export class AuthenticationController {
     */
     return this.authenticationService.login(req.user);
   }
-
-  // example of protected routes:
-  // @UseGuards(JwtAuthGuard)
-  // @Get('profile')
-  // getProfile(@Req() req: Request) {
-  //   return req.user;
-  // }
 }

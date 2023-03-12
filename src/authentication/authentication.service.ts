@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
@@ -25,12 +25,12 @@ export class AuthenticationService {
 
   async validateEmailUniqueness(email: string): Promise<void> {
     const emailExists = await this.usersService.findByEmail(email);
-    if (emailExists) throw new BadRequestException('Email already taken');
+    if (emailExists) throw new ConflictException('Email already taken');
   }
 
   async validateUsernameUniqueness(username: string): Promise<void> {
     const usernameExists = await this.usersService.findByUsername(username);
-    if (usernameExists) throw new BadRequestException('Username already taken');
+    if (usernameExists) throw new ConflictException('Username already taken');
   }
 
   buildToken(user: any): Token {

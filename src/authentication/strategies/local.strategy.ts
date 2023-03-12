@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { AuthenticationService } from '../authentication.service';
+import { INVALID_CREDENTIALS } from '../constants';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -22,7 +23,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       password
     );
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
     return user;
   }

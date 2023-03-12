@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { Subscription } from './subscriptions/entities/subscription.entity';
 
 @Module({
   imports: [
@@ -14,10 +16,11 @@ import { UsersModule } from './users/users.module';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'movie-subscriber.sqlite',
-      entities: [User],
-      // ojo con esto en production:
+      entities: [User, Subscription],
+      // TODO: cambiar esto en production:
       synchronize: true,
     }),
+    SubscriptionsModule,
   ],
   // controllers are empty because we don't have an AppController
   // controllers are always Controllers
