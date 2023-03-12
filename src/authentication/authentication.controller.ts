@@ -2,8 +2,8 @@ import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { Request } from 'express';
 
 import { AuthenticationService, Token } from './authentication.service';
-import { SignUpUserDto } from './dto/sign-up-user.dto';
-import { LocalAuthGuard } from './local-auth.guard';
+import { SignUpUserDto } from './dto';
+import { LocalAuthGuard } from './guards';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -17,7 +17,6 @@ export class AuthenticationController {
   // esta auth guard es la que crea el req.user.
   // esto se hace solo si el metodo validate() devuelve algo que no sea null.
   // si devuelve null, entonces no se llama al metodo de abajo (this.authenticationService.login(req.user))
-
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@Req() req: Request) {

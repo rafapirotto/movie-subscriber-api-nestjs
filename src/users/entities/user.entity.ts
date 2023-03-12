@@ -1,4 +1,5 @@
 import { Exclude } from 'class-transformer';
+import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 import {
   Entity,
   Column,
@@ -6,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('users')
@@ -33,4 +35,7 @@ export class User {
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt?: Date;
+
+  @OneToMany(() => Subscription, (subscription) => subscription.user)
+  subscriptions: Subscription[];
 }
