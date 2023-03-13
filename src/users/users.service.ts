@@ -9,8 +9,13 @@ export class UsersService {
   constructor(@InjectRepository(User) private repository: Repository<User>) {}
 
   create(email: string, username: string, password: string): Promise<User> {
+    // el create crea una instancia de una entidad, pero no la guarda (x eso usamos el save mas abajo)
     const user = this.repository.create({ email, username, password });
+    // El save: saves a given entity or array of entities. If the entity already exist in the database, it is updated.
+    // If the entity does not exist in the database, it is inserted.
+    // Returns the saved entity/entities
     return this.repository.save(user);
+    // mas info aca: https://typeorm.io/repository-api
   }
 
   findById(id: string, withDeleted = false): Promise<User> {

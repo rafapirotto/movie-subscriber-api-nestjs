@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
@@ -23,4 +24,8 @@ export class Subscription {
   // esto del @JoinColumn() se lo pongo para que no llame a la columna "userId", xq quiero los nombres snake_case
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @DeleteDateColumn({ name: 'deactivated_at' })
+  // lo ponemos como opcional xq al principio es null
+  deactivatedAt?: Date;
 }
