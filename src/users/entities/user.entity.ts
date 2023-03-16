@@ -1,5 +1,4 @@
 import { Exclude } from 'class-transformer';
-import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 import {
   Entity,
   Column,
@@ -9,6 +8,8 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
+
+import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 
 @Entity('users')
 export class User {
@@ -25,6 +26,8 @@ export class User {
   @Exclude()
   @Column()
   password: string;
+  // si tengo problemas con la password:
+  // https://stackoverflow.com/questions/64635617/how-to-set-a-nullable-database-field-to-null-with-typeorm
 
   @CreateDateColumn({ name: 'created_at' })
   // this value is saved in UTC-0 (aka UTC a secas) time

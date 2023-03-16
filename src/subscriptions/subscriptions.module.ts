@@ -1,13 +1,19 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionsController } from './subscriptions.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscription } from './entities/subscription.entity';
 import { UsersModule } from 'src/users/users.module';
+import { MoviesModule } from 'src/movies/movies.module';
 
 @Module({
-  // the following line of code is what creates the repository for us:
-  imports: [TypeOrmModule.forFeature([Subscription]), UsersModule],
+  imports: [
+    // the following line of code is what creates the repository for us:
+    TypeOrmModule.forFeature([Subscription]),
+    UsersModule,
+    MoviesModule,
+  ],
   controllers: [SubscriptionsController],
   providers: [SubscriptionsService],
 })
