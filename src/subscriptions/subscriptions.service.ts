@@ -70,6 +70,10 @@ export class SubscriptionsService {
       return this.repository.softRemove(dbSubscription);
     }
   }
+
+  async getAll({ id: userId }: DecodedUser): Promise<Array<Subscription>> {
+    return this.repository.find({ where: { userId } });
+  }
 }
 
 // querybuilder vs repository:

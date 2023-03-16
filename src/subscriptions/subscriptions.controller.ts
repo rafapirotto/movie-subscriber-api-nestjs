@@ -7,6 +7,7 @@ import {
   Delete,
   Param,
   ParseUUIDPipe,
+  Get,
 } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -36,5 +37,10 @@ export class SubscriptionsController {
     @Req() req: Request
   ) {
     return this.subscriptionsService.remove(req.user as DecodedUser, movieId);
+  }
+
+  @Get()
+  getAll(@Req() req: Request) {
+    return this.subscriptionsService.getAll(req.user as DecodedUser);
   }
 }
