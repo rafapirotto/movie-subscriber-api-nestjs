@@ -8,14 +8,20 @@ import { Repository } from 'typeorm';
 
 import { AddSubscriptionDto } from './dto';
 import { Subscription } from './entities/subscription.entity';
-import { ACTIVE_SUBSCRIPTION, NO_ACTIVE_SUBSCRIPTION } from './constants';
+import {
+  ACTIVE_SUBSCRIPTION,
+  buildUrl,
+  NO_ACTIVE_SUBSCRIPTION,
+} from './constants';
 import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
+import { MoviesService } from 'src/movies/movies.service';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
     @InjectRepository(Subscription)
-    private repository: Repository<Subscription>
+    private repository: Repository<Subscription>,
+    private moviesService: MoviesService
   ) {}
 
   async find(
@@ -33,6 +39,18 @@ export class SubscriptionsService {
     { id: userId }: DecodedUser,
     { movieId }: AddSubscriptionDto
   ): Promise<Subscription> {
+    const movieExists = await this.moviesService.find(movieId);
+
+    if (!movieExists) {
+      const movieURL = buildUrl(movieId);
+      const fetchedMovie = await fetch(movieURL);
+      const { title, posterUrl } = await fetchedMovie.json();
+      await this.moviesService.addMovie({
+        id: movieId,
+        name: title,
+        posterUrl,
+      });
+    }
     // si no le pongo el true en el tercer parametro, no me trae los que fueron borrados
     // y los preciso para hacer la distincion
     // tres casos:
