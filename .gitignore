@@ -1,8 +1,8 @@
 # compiled output
 /dist
 /node_modules
-*.sqlite
 *.TODO
+.env
 
 # Logs
 logs

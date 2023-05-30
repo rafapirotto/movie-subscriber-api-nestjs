@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
 import { UsersModule } from 'src/users/users.module';
 import { LocalStrategy, JwtStrategy } from './strategies';
-import { jwtConstants } from './constants';
+import { EnvVariables } from 'src/app.module';
 
 @Module({
   // here we put the service associated with our module
@@ -18,9 +19,16 @@ import { jwtConstants } from './constants';
   imports: [
     UsersModule,
     PassportModule,
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '2h' },
+    // se usa la version async cuando queremos cargar cosas usando un service por ejemplo
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService<EnvVariables>) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get('JWT_EXPIRATION'),
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   // here we put the controller associated with our module
