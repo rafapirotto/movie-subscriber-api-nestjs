@@ -29,7 +29,7 @@ export class AuthenticationController {
             "email": "pirotto@outlook.com",
             "username": "rafa130397",
             "createdAt": "2023-03-12T16:31:59.000Z",
-            "updatedAT": "2023-03-12T16:31:59.000Z",
+            "updatedAt": "2023-03-12T16:31:59.000Z",
             "deletedAt": null
           }
     */

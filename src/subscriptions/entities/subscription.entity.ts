@@ -5,6 +5,8 @@ import {
   ManyToOne,
   JoinColumn,
   DeleteDateColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
@@ -42,9 +44,14 @@ export class Subscription {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @DeleteDateColumn({ name: 'deactivated_at' })
-  // lo ponemos como opcional xq al principio es null
-  deactivatedAt?: Date;
+  @CreateDateColumn({ name: 'created_at', nullable: false })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', nullable: false })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  deletedAt?: Date;
 }
 
 // Join columns are always a reference to some other columns (using a foreign key). By default your relation always refers to the primary column of the related entity. If you want to create relation with other columns of the related entity - you can specify them in @JoinColumn as well:

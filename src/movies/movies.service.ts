@@ -18,7 +18,7 @@ export class MoviesService {
     });
   }
 
-  async addMovie(movie: Movie): Promise<void> {
+  async addMovie(movie: Partial<Movie>): Promise<void> {
     const movieInstance = this.repository.create(movie);
     await this.repository.save(movieInstance);
   }

@@ -29,14 +29,13 @@ export class User {
   // si tengo problemas con la password:
   // https://stackoverflow.com/questions/64635617/how-to-set-a-nullable-database-field-to-null-with-typeorm
 
-  @CreateDateColumn({ name: 'created_at' })
-  // this value is saved in UTC-0 (aka UTC a secas) time
+  @CreateDateColumn({ name: 'created_at', nullable: false })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAT: Date;
+  @UpdateDateColumn({ name: 'updated_at', nullable: false })
+  updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
   @OneToMany(() => Subscription, (subscription) => subscription.user)
