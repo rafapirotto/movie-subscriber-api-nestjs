@@ -1,9 +1,11 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import { INVALID_CREDENTIALS, jwtConstants } from '../constants';
+import { INVALID_CREDENTIALS } from '../constants';
 import { UsersService } from 'src/users/users.service';
+import { EnvVariables } from 'src/app.module';
 
 export type DecodedUser = {
   id: string;
@@ -12,7 +14,10 @@ export type DecodedUser = {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly usersService: UsersService) {
+  constructor(
+    private readonly usersService: UsersService,
+    protected readonly configService: ConfigService<EnvVariables>
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -22,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         we ensure that the verify phase performed by Passport,
         and the sign phase performed in our AuthService, use a common secre
       */
-      secretOrKey: jwtConstants.secret,
+      secretOrKey: configService.get('JWT_SECRET', { infer: true }),
     });
   }
 

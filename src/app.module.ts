@@ -11,8 +11,29 @@ import { User } from './users/entities/user.entity';
 import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Movie } from './movies/entities/movie.entity';
 
+enum Environments {
+  DEV = 'development',
+  PROD = 'production',
+}
+
+export interface EnvVariables {
+  DB_HOST: string;
+  DB_PORT: number;
+  DB_USERNAME: string;
+  DB_PASSWORD: string;
+  DB_NAME: string;
+  ENV: Environments;
+  JWT_SECRET: string;
+  JWT_EXPIRATION: string;
+}
+
 @Module({
   imports: [
+    // The setting isGlobal: true will automatically import ConfigModule to all other modules,
+    // which means you do not need to import it in Users.module.ts file
+    // sin embargo, para usarlo tengo que pasarlo como parametro al constructor
+    // hay un ejemplo aca: src/authentication/strategies/jwt.strategy.ts
+    ConfigModule.forRoot({ isGlobal: true }),
     // here we import all of our modules
     AuthenticationModule,
     UsersModule,
@@ -22,22 +43,28 @@ import { Movie } from './movies/entities/movie.entity';
     TypeOrmModule.forRootAsync({
       // source: https://blog.devgenius.io/setting-up-nestjs-with-postgresql-ac2cce9045fe
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService<EnvVariables>) => ({
         type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: +configService.get<number>('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
+        // With the infer property set to true, the ConfigService#get method
+        // will automatically infer the property type based on the interface
+        host: configService.get('DB_HOST', { infer: true }),
+        // tenemos type safety gracias al generic que le pasamos al ConfigService: ConfigService<EnvVariables>
+        // es decir, si queremos poner configService.get('algo-que-no-existe'), TS nos va a dar un error
+        port: configService.get('DB_PORT', { infer: true }),
+        // el infer: true de arriba hace que 'port' sea de type 'number' y no de type 'any'
+        username: configService.get('DB_USERNAME', {
+          infer: true,
+        }),
+        password: configService.get('DB_PASSWORD', {
+          infer: true,
+        }),
+        database: configService.get('DB_NAME', { infer: true }),
         entities: [User, Subscription, Movie],
         synchronize:
-          configService.get<string>('ENV').toLowerCase() !== 'production',
+          configService.get('ENV', { infer: true }) === Environments.DEV,
       }),
       inject: [ConfigService],
     }),
-    // The setting isGlobal: true will automatically import ConfigModule to all other modules,
-    // which means you do not need to import it in Users.module.ts file
-    ConfigModule.forRoot({ isGlobal: true }),
     SubscriptionsModule,
     MoviesModule,
   ],
