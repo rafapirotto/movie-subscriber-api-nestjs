@@ -64,8 +64,8 @@ export class SubscriptionsService {
       const subscription = this.repository.create({ movieId, userId });
       return this.repository.save(subscription);
     }
-    if (!!dbSubscription.deactivatedAt) {
-      // hacemos esto del recover (le pone en null el deactivatedAt)
+    if (!!dbSubscription.deletedAt) {
+      // hacemos esto del recover (le pone en null el deletedAt)
       // para evitar que se cree otra columna
       // tengo que pasarle una entity instance
       return this.repository.recover(dbSubscription);
@@ -79,10 +79,10 @@ export class SubscriptionsService {
     movieId: string
   ): Promise<Subscription> {
     const dbSubscription = await this.find(userId, movieId, true);
-    if (!dbSubscription || !!dbSubscription.deactivatedAt) {
+    if (!dbSubscription || !!dbSubscription.deletedAt) {
       throw new NotFoundException(NO_ACTIVE_SUBSCRIPTION);
     }
-    if (!dbSubscription.deactivatedAt) {
+    if (!dbSubscription.deletedAt) {
       // si no le paso una entity al softRemove no funciona bien
       // es por esto que hago el find arriba
       return this.repository.softRemove(dbSubscription);
