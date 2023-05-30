@@ -25,6 +25,7 @@ export interface EnvVariables {
   ENV: Environments;
   JWT_SECRET: string;
   JWT_EXPIRATION: string;
+  PORT: number;
 }
 
 @Module({

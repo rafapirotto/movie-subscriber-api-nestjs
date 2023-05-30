@@ -15,6 +15,7 @@ import {
 } from './constants';
 import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
 import { MoviesService } from 'src/movies/movies.service';
+import { callWithRetry } from 'src/utils';
 
 @Injectable()
 export class SubscriptionsService {
@@ -43,7 +44,7 @@ export class SubscriptionsService {
 
     if (!movieExists) {
       const movieURL = buildUrl(movieId);
-      const fetchedMovie = await fetch(movieURL);
+      const fetchedMovie = await callWithRetry(() => fetch(movieURL));
       const { title, posterUrl } = await fetchedMovie.json();
       await this.moviesService.addMovie({
         id: movieId,

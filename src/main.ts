@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 
-import { AppModule } from './app.module';
+import { AppModule, EnvVariables } from './app.module';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,6 +10,8 @@ async function bootstrap() {
   // Ejemplo: Dto tiene email de tipo string y la request trae un email y una password.
   // Bueno esa password se saca del body automaticamente
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  await app.listen(3000);
+  const config = app.get<ConfigService<EnvVariables>>(ConfigService);
+  const PORT = config.get('PORT', { infer: true });
+  await app.listen(PORT);
 }
 bootstrap();
