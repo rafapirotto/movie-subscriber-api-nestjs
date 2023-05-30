@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { INVALID_CREDENTIALS } from '../constants';
 import { UsersService } from 'src/users/users.service';
-import { EnvVariables } from 'src/app.module';
+import { EnvVariables } from 'src/types';
 
 export type DecodedUser = {
   id: string;
