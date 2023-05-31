@@ -50,8 +50,8 @@ export class Subscription {
   @UpdateDateColumn({ name: 'updated_at', nullable: false })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  deletedAt?: Date;
+  @DeleteDateColumn({ name: 'available_at', nullable: true })
+  availableAt?: Date;
 }
 
 // Join columns are always a reference to some other columns (using a foreign key). By default your relation always refers to the primary column of the related entity. If you want to create relation with other columns of the related entity - you can specify them in @JoinColumn as well:

@@ -10,7 +10,7 @@ import { LocalStrategy, JwtStrategy } from './strategies';
 import { EnvVariables } from 'src/types';
 
 @Module({
-  // here we put the service associated with our module
+  // here we put the services associated with our module
   providers: [AuthenticationService, LocalStrategy, JwtStrategy],
   // here we put dependencies (in the form of modules) of our module
   // for instance, our AuthenticationService (which is inside our AuthenticationModule) uses the UsersService
