@@ -4,7 +4,7 @@ import {
   DEFAULT_INCREMENT_IN_MS,
   MAX_RETRIES,
   MOVIE_DOES_NOT_EXIST_IN_MC_DB,
-} from './subscriptions/constants';
+} from '../subscriptions/constants';
 
 const sleep = (ms: number): Promise<number> =>
   new Promise((resolve) => setTimeout(resolve, ms));

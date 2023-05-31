@@ -11,6 +11,7 @@ import {
 
 import { User } from 'src/users/entities/user.entity';
 import { Movie } from 'src/movies/entities/movie.entity';
+import { Priority } from '../types';
 
 @Entity('subscriptions')
 export class Subscription {
@@ -35,6 +36,9 @@ export class Subscription {
   // y de esta manera, no me crea otra columna
   @Column('uuid', { name: 'movie_id' })
   movieId: string;
+
+  @Column({ nullable: false })
+  priority: Priority;
 
   @Column('uuid', { name: 'user_id' })
   public userId: string;

@@ -11,7 +11,7 @@ import { MoviesModule } from './movies/movies.module';
 import { User } from './users/entities/user.entity';
 import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Movie } from './movies/entities/movie.entity';
-import { EnvVariables, Environments } from './types';
+import { EnvVariables, Environments } from './common';
 import { CronjobsModule } from './cronjobs/cronjobs.module';
 
 @Module({

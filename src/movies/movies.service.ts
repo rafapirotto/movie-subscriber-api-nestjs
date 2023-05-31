@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Movie } from './entities/movie.entity';
-import { callWithRetry } from 'src/utils';
+import { callWithRetry } from '../common';
 
 const buildMovieUrl = (id: string): string => {
   return `https://api.movie.com.uy/api/content/shows/all?contentId=${id}`;

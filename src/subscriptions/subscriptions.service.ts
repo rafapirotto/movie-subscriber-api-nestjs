@@ -11,11 +11,12 @@ import { Subscription } from './entities/subscription.entity';
 import {
   ACTIVE_SUBSCRIPTION,
   buildUrl,
+  DEFAULT_PUSHOVER_PRIORITY,
   NO_ACTIVE_SUBSCRIPTION,
 } from './constants';
 import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
 import { MoviesService } from 'src/movies/movies.service';
-import { callWithRetry } from 'src/utils';
+import { callWithRetry } from '../common';
 import { AvailableSubscription } from 'src/cronjobs/cronjobs.service';
 
 @Injectable()
@@ -39,7 +40,7 @@ export class SubscriptionsService {
 
   async add(
     { id: userId }: DecodedUser,
-    { movieId }: AddSubscriptionDto
+    { movieId, priority = DEFAULT_PUSHOVER_PRIORITY }: AddSubscriptionDto
   ): Promise<Subscription> {
     const movieExists = await this.moviesService.find(movieId);
 
@@ -63,7 +64,11 @@ export class SubscriptionsService {
     if (!dbSubscription) {
       // si el userId que le paso al create() no existe en la tabla 'users', me va a tirar un error
       // ya que userId es una foreign key, entonces sql va a chequear que ese userId exista en la tabla 'users'
-      const subscription = this.repository.create({ movieId, userId });
+      const subscription = this.repository.create({
+        movieId,
+        userId,
+        priority,
+      });
       return this.repository.save(subscription);
     }
     if (!!dbSubscription.availableAt) {

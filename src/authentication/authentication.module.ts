@@ -7,7 +7,7 @@ import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
 import { UsersModule } from 'src/users/users.module';
 import { LocalStrategy, JwtStrategy } from './strategies';
-import { EnvVariables } from 'src/types';
+import { EnvVariables } from '../common';
 
 @Module({
   // here we put the services associated with our module
