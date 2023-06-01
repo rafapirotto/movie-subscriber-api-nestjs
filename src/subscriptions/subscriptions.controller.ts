@@ -40,7 +40,9 @@ export class SubscriptionsController {
   }
 
   @Get()
-  getAll(@Req() req: Request) {
-    return this.subscriptionsService.getAll(req.user as DecodedUser);
+  getAllByUserId(@Req() req: Request) {
+    return this.subscriptionsService.getAllActiveSubscriptionsByUserId(
+      req.user as DecodedUser
+    );
   }
 }

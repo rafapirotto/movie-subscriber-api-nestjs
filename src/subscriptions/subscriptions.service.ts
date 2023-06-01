@@ -11,10 +11,13 @@ import { Subscription } from './entities/subscription.entity';
 import {
   ACTIVE_SUBSCRIPTION,
   buildUrl,
+  DEFAULT_PUSHOVER_PRIORITY,
   NO_ACTIVE_SUBSCRIPTION,
 } from './constants';
 import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
 import { MoviesService } from 'src/movies/movies.service';
+import { callWithRetry } from '../common';
+import { AvailableSubscription } from 'src/cronjobs/cronjobs.service';
 
 @Injectable()
 export class SubscriptionsService {
@@ -37,13 +40,13 @@ export class SubscriptionsService {
 
   async add(
     { id: userId }: DecodedUser,
-    { movieId }: AddSubscriptionDto
+    { movieId, priority = DEFAULT_PUSHOVER_PRIORITY }: AddSubscriptionDto
   ): Promise<Subscription> {
     const movieExists = await this.moviesService.find(movieId);
 
     if (!movieExists) {
       const movieURL = buildUrl(movieId);
-      const fetchedMovie = await fetch(movieURL);
+      const fetchedMovie = await callWithRetry(() => fetch(movieURL));
       const { title, posterUrl } = await fetchedMovie.json();
       await this.moviesService.addMovie({
         id: movieId,
@@ -55,17 +58,21 @@ export class SubscriptionsService {
     // y los preciso para hacer la distincion
     // tres casos:
     // nunca fue agregado (aca lo agrego)
-    // fue agregado y lo borraron (aca le cambio el deletedAt a null)
+    // fue agregado y lo borraron (aca le cambio el availableAt a null)
     // fue agregado y no lo borraron (aca hago un throw exception)
     const dbSubscription = await this.find(userId, movieId, true);
     if (!dbSubscription) {
       // si el userId que le paso al create() no existe en la tabla 'users', me va a tirar un error
       // ya que userId es una foreign key, entonces sql va a chequear que ese userId exista en la tabla 'users'
-      const subscription = this.repository.create({ movieId, userId });
+      const subscription = this.repository.create({
+        movieId,
+        userId,
+        priority,
+      });
       return this.repository.save(subscription);
     }
-    if (!!dbSubscription.deletedAt) {
-      // hacemos esto del recover (le pone en null el deletedAt)
+    if (!!dbSubscription.availableAt) {
+      // hacemos esto del recover (le pone en null el availableAt)
       // para evitar que se cree otra columna
       // tengo que pasarle una entity instance
       return this.repository.recover(dbSubscription);
@@ -79,18 +86,52 @@ export class SubscriptionsService {
     movieId: string
   ): Promise<Subscription> {
     const dbSubscription = await this.find(userId, movieId, true);
-    if (!dbSubscription || !!dbSubscription.deletedAt) {
+    if (!dbSubscription || !!dbSubscription.availableAt) {
       throw new NotFoundException(NO_ACTIVE_SUBSCRIPTION);
     }
-    if (!dbSubscription.deletedAt) {
+    if (!dbSubscription.availableAt) {
       // si no le paso una entity al softRemove no funciona bien
       // es por esto que hago el find arriba
       return this.repository.softRemove(dbSubscription);
     }
   }
 
-  async getAll({ id: userId }: DecodedUser): Promise<Array<Subscription>> {
+  async getAllActiveSubscriptionsByUserId({
+    id: userId,
+  }: DecodedUser): Promise<Array<Subscription>> {
     return this.repository.find({ where: { userId } });
+  }
+
+  async getAllActiveSubscriptions(): Promise<Array<Subscription>> {
+    return this.repository.find({
+      withDeleted: false,
+      relations: ['user', 'movie'],
+    });
+  }
+
+  async purgeAvailableSubscriptions(
+    availableSubscriptions: AvailableSubscription[]
+  ): Promise<void> {
+    const subscriptionIds = availableSubscriptions.map(({ id }) => id);
+    try {
+      await this.repository.manager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager
+            .createQueryBuilder()
+            .update(Subscription)
+            .set({
+              availableAt: new Date(),
+            })
+            .whereInIds(subscriptionIds)
+            .execute();
+        }
+      );
+    } catch (error) {
+      console.log(
+        'Available subscriptions update failed, ids:',
+        subscriptionIds
+      );
+    }
   }
 }
 

@@ -7,10 +7,10 @@ import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
 import { UsersModule } from 'src/users/users.module';
 import { LocalStrategy, JwtStrategy } from './strategies';
-import { EnvVariables } from 'src/app.module';
+import { EnvVariables } from '../common';
 
 @Module({
-  // here we put the service associated with our module
+  // here we put the services associated with our module
   providers: [AuthenticationService, LocalStrategy, JwtStrategy],
   // here we put dependencies (in the form of modules) of our module
   // for instance, our AuthenticationService (which is inside our AuthenticationModule) uses the UsersService

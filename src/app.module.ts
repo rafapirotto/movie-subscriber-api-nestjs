@@ -2,6 +2,7 @@ import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthenticationModule } from './authentication/authentication.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
@@ -10,22 +11,9 @@ import { MoviesModule } from './movies/movies.module';
 import { User } from './users/entities/user.entity';
 import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Movie } from './movies/entities/movie.entity';
-
-enum Environments {
-  DEV = 'development',
-  PROD = 'production',
-}
-
-export interface EnvVariables {
-  DB_HOST: string;
-  DB_PORT: number;
-  DB_USERNAME: string;
-  DB_PASSWORD: string;
-  DB_NAME: string;
-  ENV: Environments;
-  JWT_SECRET: string;
-  JWT_EXPIRATION: string;
-}
+import { EnvVariables, Environments } from './common';
+import { CronjobsModule } from './cronjobs/cronjobs.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -34,6 +22,7 @@ export interface EnvVariables {
     // sin embargo, para usarlo tengo que pasarlo como parametro al constructor
     // hay un ejemplo aca: src/authentication/strategies/jwt.strategy.ts
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     // here we import all of our modules
     AuthenticationModule,
     UsersModule,
@@ -67,6 +56,8 @@ export interface EnvVariables {
     }),
     SubscriptionsModule,
     MoviesModule,
+    CronjobsModule,
+    NotificationsModule,
   ],
   // controllers are empty because we don't have an AppController
   // controllers are always Controllers

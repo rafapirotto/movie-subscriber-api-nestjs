@@ -16,5 +16,6 @@ import { MoviesModule } from 'src/movies/movies.module';
   ],
   controllers: [SubscriptionsController],
   providers: [SubscriptionsService],
+  exports: [SubscriptionsService],
 })
 export class SubscriptionsModule {}

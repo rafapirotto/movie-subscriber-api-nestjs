@@ -11,6 +11,7 @@ import {
 
 import { User } from 'src/users/entities/user.entity';
 import { Movie } from 'src/movies/entities/movie.entity';
+import { Priority } from '../types';
 
 @Entity('subscriptions')
 export class Subscription {
@@ -36,6 +37,9 @@ export class Subscription {
   @Column('uuid', { name: 'movie_id' })
   movieId: string;
 
+  @Column({ nullable: false })
+  priority: Priority;
+
   @Column('uuid', { name: 'user_id' })
   public userId: string;
 
@@ -50,8 +54,8 @@ export class Subscription {
   @UpdateDateColumn({ name: 'updated_at', nullable: false })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  deletedAt?: Date;
+  @DeleteDateColumn({ name: 'available_at', nullable: true })
+  availableAt?: Date;
 }
 
 // Join columns are always a reference to some other columns (using a foreign key). By default your relation always refers to the primary column of the related entity. If you want to create relation with other columns of the related entity - you can specify them in @JoinColumn as well:
