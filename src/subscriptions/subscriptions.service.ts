@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,9 +11,10 @@ import { AddSubscriptionDto } from './dto';
 import { Subscription } from './entities/subscription.entity';
 import {
   ACTIVE_SUBSCRIPTION,
+  INACTIVE_SUBSCRIPTION,
   buildUrl,
   DEFAULT_PUSHOVER_PRIORITY,
-  NO_ACTIVE_SUBSCRIPTION,
+  NO_SUBSCRIPTION_FOUND,
 } from './constants';
 import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
 import { MoviesService } from 'src/movies/movies.service';
@@ -69,13 +71,14 @@ export class SubscriptionsService {
         userId,
         priority,
       });
-      return this.repository.save(subscription);
+      await this.repository.save(subscription);
+      return this.repository.findOne({
+        where: { userId },
+        relations: ['movie'],
+      });
     }
     if (!!dbSubscription.availableAt) {
-      // hacemos esto del recover (le pone en null el availableAt)
-      // para evitar que se cree otra columna
-      // tengo que pasarle una entity instance
-      return this.repository.recover(dbSubscription);
+      throw new UnprocessableEntityException(INACTIVE_SUBSCRIPTION);
     } else {
       throw new ConflictException(ACTIVE_SUBSCRIPTION);
     }
@@ -87,7 +90,7 @@ export class SubscriptionsService {
   ): Promise<Subscription> {
     const dbSubscription = await this.find(userId, movieId, true);
     if (!dbSubscription || !!dbSubscription.availableAt) {
-      throw new NotFoundException(NO_ACTIVE_SUBSCRIPTION);
+      throw new NotFoundException(NO_SUBSCRIPTION_FOUND);
     }
     if (!dbSubscription.availableAt) {
       // si no le paso una entity al softRemove no funciona bien
@@ -99,7 +102,7 @@ export class SubscriptionsService {
   async getAllActiveSubscriptionsByUserId({
     id: userId,
   }: DecodedUser): Promise<Array<Subscription>> {
-    return this.repository.find({ where: { userId } });
+    return this.repository.find({ where: { userId }, relations: ['movie'] });
   }
 
   async getAllActiveSubscriptions(): Promise<Array<Subscription>> {
