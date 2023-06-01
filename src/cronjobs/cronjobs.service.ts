@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { MoviesService } from 'src/movies/movies.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { PushoverDevice } from 'src/notifications/types';
 import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 import { SubscriptionsService } from 'src/subscriptions/subscriptions.service';
 
@@ -13,7 +15,8 @@ export type AvailableSubscription = Subscription & {
 export class CronjobsService {
   constructor(
     private subscriptionsService: SubscriptionsService,
-    private moviesService: MoviesService
+    private moviesService: MoviesService,
+    private notificationsService: NotificationsService
   ) {}
   private readonly logger = new Logger(CronjobsService.name);
 
@@ -29,14 +32,30 @@ export class CronjobsService {
     );
   };
 
-  notifyUsers(availableSubscriptions: AvailableSubscription[]) {
-    availableSubscriptions.forEach((resolvedSubscription) => {
-      const { user, movie } = resolvedSubscription;
-      this.logger.log(`Notify user ${user.username} of: ${movie.name}`);
-    });
+  async notifyUsers(availableSubscriptions: AvailableSubscription[]) {
+    try {
+      await Promise.allSettled(
+        availableSubscriptions.map(async (availableSubscription) => {
+          const { user, movie, priority } = availableSubscription;
+          const title = 'Available tickets';
+          const message = `Hey ${user.username}, the tickets for ${movie.name} are available`;
+          return this.notificationsService.send(
+            title,
+            message,
+            priority,
+            PushoverDevice.IPHONE_RAFA
+          );
+        })
+      );
+    } catch (error) {
+      this.logger.error(
+        'There was an error trying to notify the users',
+        availableSubscriptions
+      );
+    }
   }
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async notifyUsersOfAvailableMovies() {
     const activeSubscriptions =
       await this.subscriptionsService.getAllActiveSubscriptions();
@@ -47,7 +66,7 @@ export class CronjobsService {
       .filter((sub) => sub.status === 'fulfilled' && sub.value.isMovieAvailable)
       // @ts-expect-error: typescript bug with fullfilled promises
       .map(({ value }: { value: AvailableSubscription }) => value);
-    this.notifyUsers(availableMovies);
+    await this.notifyUsers(availableMovies);
 
     await this.subscriptionsService.purgeAvailableSubscriptions(
       availableMovies

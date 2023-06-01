@@ -13,6 +13,7 @@ import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Movie } from './movies/entities/movie.entity';
 import { EnvVariables, Environments } from './common';
 import { CronjobsModule } from './cronjobs/cronjobs.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { CronjobsModule } from './cronjobs/cronjobs.module';
     SubscriptionsModule,
     MoviesModule,
     CronjobsModule,
+    NotificationsModule,
   ],
   // controllers are empty because we don't have an AppController
   // controllers are always Controllers
