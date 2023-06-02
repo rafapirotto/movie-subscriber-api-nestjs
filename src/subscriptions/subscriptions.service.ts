@@ -71,9 +71,9 @@ export class SubscriptionsService {
         userId,
         priority,
       });
-      await this.repository.save(subscription);
+      const { id: subscriptionId } = await this.repository.save(subscription);
       return this.repository.findOne({
-        where: { userId },
+        where: { id: subscriptionId },
         relations: ['movie'],
       });
     }

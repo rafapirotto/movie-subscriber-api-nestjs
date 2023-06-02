@@ -35,22 +35,14 @@ import { NotificationsModule } from './notifications/notifications.module';
       useFactory: (configService: ConfigService<EnvVariables>) => ({
         type: 'postgres',
         // With the infer property set to true, the ConfigService#get method
-        // will automatically infer the property type based on the interface
-        host: configService.get('DB_HOST', { infer: true }),
-        // tenemos type safety gracias al generic que le pasamos al ConfigService: ConfigService<EnvVariables>
-        // es decir, si queremos poner configService.get('algo-que-no-existe'), TS nos va a dar un error
-        port: configService.get('DB_PORT', { infer: true }),
-        // el infer: true de arriba hace que 'port' sea de type 'number' y no de type 'any'
-        username: configService.get('DB_USERNAME', {
-          infer: true,
-        }),
-        password: configService.get('DB_PASSWORD', {
-          infer: true,
-        }),
-        database: configService.get('DB_NAME', { infer: true }),
+        // will automatically infer the property type based on the interface.
+        // Tenemos type safety gracias al generic que le pasamos al ConfigService: ConfigService<EnvVariables>,
+        // es decir, si queremos poner configService.get('algo-que-no-existe'), TS nos va a dar un error.
+        // El infer: true de arriba hace que 'port' sea de type 'number' y no de type 'any'
         entities: [User, Subscription, Movie],
         synchronize:
           configService.get('ENV', { infer: true }) === Environments.DEV,
+        url: configService.get('DATABASE_URL', { infer: true }),
       }),
       inject: [ConfigService],
     }),
