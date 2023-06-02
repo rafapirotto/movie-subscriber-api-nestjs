@@ -55,7 +55,9 @@ export class CronjobsService {
     }
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  // to add dynamic cron expressions:
+  // https://medium.com/@sangimed/nestjs-externalize-cron-expressions-in-a-env-file-ca09d3cb2bec
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async notifyUsersOfAvailableMovies() {
     const activeSubscriptions =
       await this.subscriptionsService.getAllActiveSubscriptions();

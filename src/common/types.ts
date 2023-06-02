@@ -4,11 +4,7 @@ export enum Environments {
 }
 
 export interface EnvVariables {
-  DB_HOST: string;
-  DB_PORT: number;
-  DB_USERNAME: string;
-  DB_PASSWORD: string;
-  DB_NAME: string;
+  DATABASE_URL: string;
   ENV: Environments;
   JWT_SECRET: string;
   JWT_EXPIRATION: string;
