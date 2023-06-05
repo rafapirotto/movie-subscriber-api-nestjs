@@ -102,7 +102,6 @@ export class SubscriptionsService {
   async getAllActiveSubscriptionsByUserId({
     id: userId,
   }: DecodedUser): Promise<Array<Subscription>> {
-    console.log('aca database_url', process.env.DATABASE_URL);
     return this.repository.find({ where: { userId }, relations: ['movie'] });
   }
 

@@ -16,6 +16,7 @@ import { Priority } from '../types';
 
 @Entity('subscriptions')
 // this creates the composite key userId, movieId at the database level
+// https://stackoverflow.com/questions/67197276/how-do-i-make-combination-of-3-columns-in-typeorm-postgres-unique
 @Unique(['userId', 'movieId'])
 export class Subscription {
   @PrimaryGeneratedColumn('uuid')
