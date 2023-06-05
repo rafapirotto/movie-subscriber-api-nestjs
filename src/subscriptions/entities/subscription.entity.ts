@@ -7,6 +7,7 @@ import {
   DeleteDateColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Unique,
 } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
@@ -14,6 +15,8 @@ import { Movie } from 'src/movies/entities/movie.entity';
 import { Priority } from '../types';
 
 @Entity('subscriptions')
+// this creates the composite key userId, movieId at the database level
+@Unique(['userId', 'movieId'])
 export class Subscription {
   @PrimaryGeneratedColumn('uuid')
   id: string;
