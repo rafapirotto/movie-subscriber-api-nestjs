@@ -17,7 +17,7 @@ export class CronjobsService {
     private subscriptionsService: SubscriptionsService,
     private moviesService: MoviesService,
     private notificationsService: NotificationsService
-  ) {}
+  ) { }
   private readonly logger = new Logger(CronjobsService.name);
 
   private checkTicketsAvailability = (activeSubscriptions: Subscription[]) => {
@@ -57,7 +57,9 @@ export class CronjobsService {
 
   // to add dynamic cron expressions:
   // https://medium.com/@sangimed/nestjs-externalize-cron-expressions-in-a-env-file-ca09d3cb2bec
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_10_SECONDS, {
+    timeZone: 'America/Montevideo',
+  })
   async notifyUsersOfAvailableMovies() {
     const activeSubscriptions =
       await this.subscriptionsService.getAllActiveSubscriptions();
