@@ -168,13 +168,19 @@ export class CronjobsService {
         if (exists) {
           this.logger.log('Hay entradas para el 29 de julio');
           await this.notificationsService.send(
-            'Tickets for Oppenheimer are ready in Buenos Aires',
-            'Tickets for Oppenheimer are ready in Buenos Aires',
+            'Tickets for Oppenheimer are ready in Buenos Aires para la fecha que queria',
+            'Tickets for Oppenheimer are ready in Buenos Aires para la fecha que queria',
             Priority.EMERGENCY,
             PushoverDevice.IPHONE_RAFA
           );
         } else {
           this.logger.log('Todavia NO hay entradas para el 29 de julio');
+          await this.notificationsService.send(
+            'Tickets for Oppenheimer are ready in Buenos Aires pero NO para la fecha que queria',
+            'Tickets for Oppenheimer are ready in Buenos Aires pero NO para la fecha que queria',
+            Priority.EMERGENCY,
+            PushoverDevice.IPHONE_RAFA
+          );
         }
       } else {
         this.logger.log('Todavia NO hay entradas para Oppenheimer');
