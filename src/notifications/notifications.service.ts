@@ -39,8 +39,8 @@ export class NotificationsService {
       });
       this.logger.log('Notification sent with the following data:', {
         ...data,
-        user,
-        token,
+        token: null,
+        user: null,
       });
     } catch (error) {
       this.logger.error('Error in the send method with these params:', {

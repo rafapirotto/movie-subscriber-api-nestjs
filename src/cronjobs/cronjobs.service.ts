@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { parse } from 'node-html-parser';
-import axios from 'axios';
+import puppeteer from 'puppeteer';
 
 import { MoviesService } from 'src/movies/movies.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
@@ -57,42 +56,137 @@ export class CronjobsService {
       );
     }
   }
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async oppenheimerTicketsAreAvailable() {
-    const { data: webpage } = await axios.get(
-      'https://www.voyalcine.net/showcase/'
-    );
-    const parsedWebpage = parse(JSON.stringify(webpage));
-    const result = parsedWebpage.querySelectorAll(
-      '.content-section , .name , img'
-    );
-    const filteredResult = result.filter((r) => r.rawTagName !== 'img');
-    const filteredResultLength = filteredResult.length;
-    const finalResult = filteredResult.slice(
-      filteredResultLength / 2,
-      filteredResultLength
-    );
-    const finalRes = finalResult.map((r) =>
-      r.childNodes[0].rawText.toLowerCase()
-    );
-    const ticketsAreAvailable = !!finalRes.find((movie) =>
-      movie.includes('oppenheimer')
-    );
+    const browser = await puppeteer.launch({ headless: 'new' });
+    try {
+      const [page] = await browser.pages();
+      await page.goto('https://www.voyalcine.net/showcase/');
+      const movieNameSelector = 'h3.name';
+      await page.waitForSelector(movieNameSelector, { timeout: 5000 });
+      const h3Elements = await page.$$(movieNameSelector);
+      const movieTitles = [];
+      const filmIds = [];
+
+      for (const h3Element of h3Elements) {
+        const textContent = await page.evaluate(
+          (element) => element.textContent,
+          h3Element
+        );
+        movieTitles.push(textContent);
+      }
+
+      const playBtnSelector = 'div.play-btn';
+      await page.waitForSelector(playBtnSelector, { timeout: 5000 });
+      const playBtnDivs = await page.$$(playBtnSelector);
+
+      for (const playBtnDiv of playBtnDivs) {
+        const anchorElement = await playBtnDiv.$('a');
+        const hrefValue = await page.evaluate(
+          (element) => element.getAttribute('href'),
+          anchorElement
+        );
+        filmIds.push(hrefValue);
+      }
+
+      const oppenheimerIndex = movieTitles.findIndex((movieTitle) =>
+        movieTitle.toLowerCase().includes('flash')
+      );
+      if (oppenheimerIndex !== -1) {
+        this.logger.log('Hay entradas para Oppenheimer');
+        this.logger.log('Chequeando si hay para la fecha que yo quiero...');
+        const filmId = filmIds[oppenheimerIndex].split('=')[1];
+        await page.goto(
+          `https://www.voyalcine.net/showcase/boleteria_plus.aspx?filmid=${filmId}`
+        );
+        await page.waitForSelector('#ctl00_Contenido_lstCinema', {
+          timeout: 5000,
+        });
+        await page.select(
+          '#ctl00_Contenido_lstCinema',
+          await page.evaluate(
+            (selector, name) => {
+              const dropdown = document.querySelector(
+                selector
+              ) as HTMLSelectElement;
+              const options = Array.from(dropdown.options);
+
+              for (const option of options) {
+                if (option.textContent === name) {
+                  return option.value;
+                }
+              }
+              this.logger.log({ selector, name, dropdown, options });
+
+              return '';
+            },
+            '#ctl00_Contenido_lstCinema',
+            'IMAX Theatre (Norcenter)'
+          )
+        );
+
+        await page.waitForSelector('#ctl00_Contenido_lstFormat', {
+          timeout: 5000,
+        });
+        await page.select(
+          '#ctl00_Contenido_lstFormat',
+          await page.evaluate(
+            (selector, name) => {
+              const dropdown = document.querySelector(
+                selector
+              ) as HTMLSelectElement;
+              const options = Array.from(dropdown.options);
+
+              for (const option of options) {
+                if (option.textContent === name) {
+                  return option.value;
+                }
+              }
+              this.logger.log({ selector, name, dropdown, options });
+
+              return '';
+            },
+            '#ctl00_Contenido_lstFormat',
+            'IMAX-Subtitulado'
+          )
+        );
+        const dropdownSelector = 'select#ctl00_Contenido_lstDays';
+        await page.waitForSelector(dropdownSelector);
+        const dropdown = await page.$(dropdownSelector);
+
+        const values = await page.evaluate((dropdown) => {
+          const options = Array.from(dropdown.options);
+          return options.map((option) => option.value);
+        }, dropdown);
+
+        const exists = values.find((value) =>
+          value.toLowerCase().includes('28 de junio')
+        );
+        if (exists) {
+          this.logger.log('Hay entradas para el 29 de julio');
+          await this.notificationsService.send(
+            'Tickets for Oppenheimer are ready in Buenos Aires',
+            'Tickets for Oppenheimer are ready in Buenos Aires',
+            Priority.EMERGENCY,
+            PushoverDevice.IPHONE_RAFA
+          );
+        } else {
+          this.logger.log('Todavia NO hay entradas para el 29 de julio');
+        }
+      } else {
+        this.logger.log('Todavia NO hay entradas para Oppenheimer');
+      }
+    } catch (error) {
+      this.logger.log('Hubo un error', error);
+    } finally {
+      await browser.close();
+    }
     const now = new Date().toLocaleString('en-GB', {
       timeZone: 'America/Montevideo',
     });
     this.logger.log(
       `Checked for oppenheimer tickets in Buenos Aires at ${now}`
     );
-    if (ticketsAreAvailable) {
-      this.logger.log(`Movie array is ${finalRes}`);
-      await this.notificationsService.send(
-        'Tickets for Oppenheimer are ready in Buenos Aires',
-        'Tickets for Oppenheimer are ready in Buenos Aires',
-        Priority.EMERGENCY,
-        PushoverDevice.IPHONE_RAFA
-      );
-    }
   }
 
   // to add dynamic cron expressions:
