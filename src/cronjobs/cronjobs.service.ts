@@ -56,9 +56,12 @@ export class CronjobsService {
       );
     }
   }
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   async oppenheimerTicketsAreAvailable() {
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     try {
       const [page] = await browser.pages();
       await page.goto('https://www.voyalcine.net/showcase/');
