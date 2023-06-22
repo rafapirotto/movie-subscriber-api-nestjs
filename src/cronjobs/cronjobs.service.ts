@@ -56,9 +56,10 @@ export class CronjobsService {
       );
     }
   }
-  @Cron(CronExpression.EVERY_10_MINUTES)
+
+  @Cron(CronExpression.EVERY_MINUTE)
   async oppenheimerTicketsAreAvailable() {
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch();
     try {
       const [page] = await browser.pages();
       await page.goto('https://www.voyalcine.net/showcase/');
@@ -154,7 +155,7 @@ export class CronjobsService {
         await page.waitForSelector(dropdownSelector);
         const dropdown = await page.$(dropdownSelector);
 
-        const values = await page.evaluate((dropdown) => {
+        const values = await page.evaluate((dropdown: HTMLSelectElement) => {
           const options = Array.from(dropdown.options);
           return options.map((option) => option.value);
         }, dropdown);
