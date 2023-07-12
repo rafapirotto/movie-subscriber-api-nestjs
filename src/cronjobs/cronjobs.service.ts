@@ -57,43 +57,6 @@ export class CronjobsService {
       );
     }
   }
-  @Cron(CronExpression.EVERY_5_MINUTES)
-  async oppenheimerTicketsAreAvailable() {
-    const { data: webpage } = await axios.get(
-      'https://www.voyalcine.net/showcase/'
-    );
-    const parsedWebpage = parse(JSON.stringify(webpage));
-    const result = parsedWebpage.querySelectorAll(
-      '.content-section , .name , img'
-    );
-    const filteredResult = result.filter((r) => r.rawTagName !== 'img');
-    const filteredResultLength = filteredResult.length;
-    const finalResult = filteredResult.slice(
-      filteredResultLength / 2,
-      filteredResultLength
-    );
-    const finalRes = finalResult.map((r) =>
-      r.childNodes[0].rawText.toLowerCase()
-    );
-    const ticketsAreAvailable = !!finalRes.find((movie) =>
-      movie.includes('oppenheimer')
-    );
-    const now = new Date().toLocaleString('en-GB', {
-      timeZone: 'America/Montevideo',
-    });
-    this.logger.log(
-      `Checked for oppenheimer tickets in Buenos Aires at ${now}`
-    );
-    if (ticketsAreAvailable) {
-      this.logger.log(`Movie array is ${finalRes}`);
-      await this.notificationsService.send(
-        'Tickets for Oppenheimer are ready in Buenos Aires',
-        'Tickets for Oppenheimer are ready in Buenos Aires',
-        Priority.EMERGENCY,
-        PushoverDevice.IPHONE_RAFA
-      );
-    }
-  }
 
   // to add dynamic cron expressions:
   // https://medium.com/@sangimed/nestjs-externalize-cron-expressions-in-a-env-file-ca09d3cb2bec
