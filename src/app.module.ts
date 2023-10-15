@@ -42,8 +42,7 @@ import { Cinema } from './cinemas/entities/cinema.entity';
         // es decir, si queremos poner configService.get('algo-que-no-existe'), TS nos va a dar un error.
         // El infer: true de arriba hace que 'port' sea de type 'number' y no de type 'any'
         entities: [User, Subscription, Movie, Cinema],
-        synchronize:
-          configService.get('ENV', { infer: true }) === Environments.DEV,
+        synchronize: false,
         url: configService.get('DATABASE_URL', { infer: true }),
         migrations: [__dirname + '/migrations/*.js'],
         migrationsTableName: 'migrations',
