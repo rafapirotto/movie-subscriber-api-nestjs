@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { Movie } from './entities/movie.entity';
 import { callWithRetry } from '../common';
+import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 
 const buildMovieUrl = (id: string): string => {
   return `https://api.movie.com.uy/api/content/shows/all?contentId=${id}`;
@@ -28,11 +29,17 @@ export class MoviesService {
     await this.repository.save(movieInstance);
   }
 
-  async checkForMovieAvailability(id: string): Promise<boolean> {
+  async checkForMovieAvailability(
+    subscription: Subscription
+  ): Promise<boolean> {
     try {
-      const response = await callWithRetry(() => fetch(buildMovieUrl(id)));
+      const response = await callWithRetry(() =>
+        fetch(buildMovieUrl(subscription.movieId))
+      );
       const parsedResponse = await response.json();
-      return parsedResponse?.availableDays?.length > 0;
+      return parsedResponse?.filters?.cinemas.some(
+        (cinema) => cinema.id === subscription.cinemaId
+      );
     } catch (error) {
       return false;
     }

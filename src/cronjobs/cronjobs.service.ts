@@ -28,7 +28,7 @@ export class CronjobsService {
       activeSubscriptions.map(async (activeSubscription) => {
         const isMovieAvailable =
           await this.moviesService.checkForMovieAvailability(
-            activeSubscription.movieId
+            activeSubscription
           );
         return { ...activeSubscription, isMovieAvailable };
       })
@@ -39,9 +39,9 @@ export class CronjobsService {
     try {
       await Promise.allSettled(
         availableSubscriptions.map(async (availableSubscription) => {
-          const { user, movie, priority } = availableSubscription;
+          const { user, movie, priority, cinema } = availableSubscription;
           const title = 'Available tickets';
-          const message = `Hey ${user.username}, the tickets for ${movie.name} are available`;
+          const message = `Hey ${user.username}, the tickets for ${movie.name} are available at ${cinema.name}`;
           return this.notificationsService.send(
             title,
             message,
