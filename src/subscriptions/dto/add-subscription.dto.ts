@@ -9,4 +9,7 @@ export class AddSubscriptionDto {
   @IsEnum(Priority)
   @IsOptional()
   priority?: number;
+
+  @IsOptional()
+  cinemaId?: string;
 }

@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "5a5d31f7-3c88-471d-83b9-288164249739",
+		"_postman_id": "a1e5e9f6-852a-409e-9a66-4be85c60eea5",
 		"name": "Movie Subscriber API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "15250194"
+		"_exporter_id": "28635313"
 	},
 	"item": [
 		{
@@ -33,12 +33,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/auth/signup",
-					"protocol": "http",
+					"raw": "{{URL}}/auth/signup",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"auth",
 						"signup"
@@ -74,12 +72,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/auth/login",
-					"protocol": "http",
+					"raw": "{{URL}}/auth/login",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"auth",
 						"login"
@@ -89,7 +85,7 @@
 			"response": []
 		},
 		{
-			"name": "Add subscription",
+			"name": "Add subscription without cinemaId",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -105,7 +101,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"movieId\": \"279a3782-0102-429b-af78-0aed40925ed6\"\n}",
+					"raw": "{\n    \"movieId\": \"9c892ba5-b8dd-45ab-ad96-33f516317bb4\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -113,12 +109,46 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/subscriptions",
-					"protocol": "http",
+					"raw": "{{URL}}/subscriptions",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
+					"path": [
+						"subscriptions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add subscription with cinemaId",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"movieId\": \"9c892ba5-b8dd-45ab-ad96-33f516317bb4\",\n    \"cinemaId\": \"001\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/subscriptions",
+					"host": [
+						"{{URL}}"
+					],
 					"path": [
 						"subscriptions"
 					]
@@ -142,12 +172,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/subscriptions",
-					"protocol": "http",
+					"raw": "{{URL}}/subscriptions",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"subscriptions"
 					]
@@ -171,14 +199,11 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/subscriptions/a6666926-18b0-4c0f-8e1c-c685072cc333",
-					"protocol": "http",
+					"raw": "{{URL}}subscriptions/a6666926-18b0-4c0f-8e1c-c685072cc333",
 					"host": [
-						"localhost"
+						"{{URL}}subscriptions"
 					],
-					"port": "3000",
 					"path": [
-						"subscriptions",
 						"a6666926-18b0-4c0f-8e1c-c685072cc333"
 					]
 				}

@@ -20,7 +20,7 @@ import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
 @UseGuards(JwtAuthGuard)
 @Controller('subscriptions')
 export class SubscriptionsController {
-  constructor(private readonly subscriptionsService: SubscriptionsService) {}
+  constructor(private readonly subscriptionsService: SubscriptionsService) { }
 
   @Post()
   add(@Req() req: Request, @Body() addSubscriptionDto: AddSubscriptionDto) {
@@ -30,14 +30,14 @@ export class SubscriptionsController {
     );
   }
 
-  @Delete('/:movieId')
-  remove(
-    // el ParseUUIDPipe sirve para validar que los ids que me pasen sean UUID y no cualquier string
-    @Param('movieId', ParseUUIDPipe) movieId: string,
-    @Req() req: Request
-  ) {
-    return this.subscriptionsService.remove(req.user as DecodedUser, movieId);
-  }
+  // @Delete('/:movieId')
+  // remove(
+  //   // el ParseUUIDPipe sirve para validar que los ids que me pasen sean UUID y no cualquier string
+  //   @Param('movieId', ParseUUIDPipe) movieId: string,
+  //   @Req() req: Request
+  // ) {
+  //   return this.subscriptionsService.remove(req.user as DecodedUser, movieId);
+  // }
 
   @Get()
   getAllByUserId(@Req() req: Request) {
