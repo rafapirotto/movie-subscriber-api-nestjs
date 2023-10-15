@@ -14,6 +14,8 @@ import { Movie } from './movies/entities/movie.entity';
 import { EnvVariables, Environments } from './common';
 import { CronjobsModule } from './cronjobs/cronjobs.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { LocationsModule } from './locations/locations.module';
+import { Location } from './locations/entities/location.entity';
 
 @Module({
   imports: [
@@ -39,12 +41,12 @@ import { NotificationsModule } from './notifications/notifications.module';
         // Tenemos type safety gracias al generic que le pasamos al ConfigService: ConfigService<EnvVariables>,
         // es decir, si queremos poner configService.get('algo-que-no-existe'), TS nos va a dar un error.
         // El infer: true de arriba hace que 'port' sea de type 'number' y no de type 'any'
-        entities: [User, Subscription, Movie],
+        entities: [User, Subscription, Movie, Location],
         synchronize: configService.get('ENV', { infer: true }) === Environments.DEV,
         url: configService.get('DATABASE_URL', { infer: true }),
         migrations: [__dirname + '/migrations/*.js'],
         migrationsTableName: "migrations",
-        migrationsRun: true
+        migrationsRun: true,
       }),
       inject: [ConfigService],
     }),
@@ -52,7 +54,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     MoviesModule,
     CronjobsModule,
     NotificationsModule,
-    // LocationsModule,
+    LocationsModule,
   ],
   // controllers are empty because we don't have an AppController
   // controllers are always Controllers

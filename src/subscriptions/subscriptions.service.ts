@@ -15,37 +15,41 @@ import {
   buildUrl,
   DEFAULT_PUSHOVER_PRIORITY,
   NO_SUBSCRIPTION_FOUND,
+  LOCATION_NOT_FOUND,
+  DEFAULT_LOCATION,
 } from './constants';
 import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
 import { MoviesService } from 'src/movies/movies.service';
 import { callWithRetry } from '../common';
 import { AvailableSubscription } from 'src/cronjobs/cronjobs.service';
+import { LocationsService } from 'src/locations/locations.service';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
     @InjectRepository(Subscription)
     private repository: Repository<Subscription>,
-    private moviesService: MoviesService
-  ) {}
+    private moviesService: MoviesService,
+    private locationsService: LocationsService
+  ) { }
 
   async find(
     userId: string,
     movieId: string,
+    locationId: string,
     withDeleted = false
   ): Promise<Subscription> {
     return this.repository.findOne({
-      where: { movieId, userId },
+      where: { movieId, userId, locationId },
       withDeleted,
     });
   }
 
   async add(
     { id: userId }: DecodedUser,
-    { movieId, priority = DEFAULT_PUSHOVER_PRIORITY }: AddSubscriptionDto
+    { movieId, locationId = DEFAULT_LOCATION.id, priority = DEFAULT_PUSHOVER_PRIORITY }: AddSubscriptionDto
   ): Promise<Subscription> {
     const movieExists = await this.moviesService.find(movieId);
-
     if (!movieExists) {
       const movieURL = buildUrl(movieId);
       const fetchedMovie = await callWithRetry(() => fetch(movieURL));
@@ -56,25 +60,31 @@ export class SubscriptionsService {
         posterUrl,
       });
     }
+
+    const locationExists = await this.locationsService.find(locationId);
+    if (!locationExists) {
+      throw new NotFoundException(LOCATION_NOT_FOUND);
+    }
     // si no le pongo el true en el tercer parametro, no me trae los que fueron borrados
     // y los preciso para hacer la distincion
     // tres casos:
     // nunca fue agregado (aca lo agrego)
     // fue agregado y lo borraron (aca le cambio el availableAt a null)
     // fue agregado y no lo borraron (aca hago un throw exception)
-    const dbSubscription = await this.find(userId, movieId, true);
+    const dbSubscription = await this.find(userId, movieId, locationId, true);
     if (!dbSubscription) {
       // si el userId que le paso al create() no existe en la tabla 'users', me va a tirar un error
       // ya que userId es una foreign key, entonces sql va a chequear que ese userId exista en la tabla 'users'
       const subscription = this.repository.create({
         movieId,
         userId,
+        locationId,
         priority,
       });
       const { id: subscriptionId } = await this.repository.save(subscription);
       return this.repository.findOne({
         where: { id: subscriptionId },
-        relations: ['movie'],
+        relations: ['movie', 'location'],
       });
     }
     if (!!dbSubscription.availableAt) {
@@ -84,31 +94,31 @@ export class SubscriptionsService {
     }
   }
 
-  async remove(
-    { id: userId }: DecodedUser,
-    movieId: string
-  ): Promise<Subscription> {
-    const dbSubscription = await this.find(userId, movieId, true);
-    if (!dbSubscription || !!dbSubscription.availableAt) {
-      throw new NotFoundException(NO_SUBSCRIPTION_FOUND);
-    }
-    if (!dbSubscription.availableAt) {
-      // si no le paso una entity al softRemove no funciona bien
-      // es por esto que hago el find arriba
-      return this.repository.softRemove(dbSubscription);
-    }
-  }
+  // async remove(
+  //   { id: userId }: DecodedUser,
+  //   movieId: string
+  // ): Promise<Subscription> {
+  //   const dbSubscription = await this.find(userId, movieId, true);
+  //   if (!dbSubscription || !!dbSubscription.availableAt) {
+  //     throw new NotFoundException(NO_SUBSCRIPTION_FOUND);
+  //   }
+  //   if (!dbSubscription.availableAt) {
+  //     // si no le paso una entity al softRemove no funciona bien
+  //     // es por esto que hago el find arriba
+  //     return this.repository.softRemove(dbSubscription);
+  //   }
+  // }
 
   async getAllActiveSubscriptionsByUserId({
     id: userId,
   }: DecodedUser): Promise<Array<Subscription>> {
-    return this.repository.find({ where: { userId }, relations: ['movie'] });
+    return this.repository.find({ where: { userId }, relations: ['movie', 'location'] });
   }
 
   async getAllActiveSubscriptions(): Promise<Array<Subscription>> {
     return this.repository.find({
       withDeleted: false,
-      relations: ['user', 'movie'],
+      relations: ['user', 'movie', 'location'],
     });
   }
 

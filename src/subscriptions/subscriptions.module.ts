@@ -6,6 +6,7 @@ import { SubscriptionsController } from './subscriptions.controller';
 import { Subscription } from './entities/subscription.entity';
 import { UsersModule } from 'src/users/users.module';
 import { MoviesModule } from 'src/movies/movies.module';
+import { LocationsModule } from 'src/locations/locations.module';
 
 @Module({
   imports: [
@@ -13,9 +14,10 @@ import { MoviesModule } from 'src/movies/movies.module';
     TypeOrmModule.forFeature([Subscription]),
     UsersModule,
     MoviesModule,
+    LocationsModule
   ],
   controllers: [SubscriptionsController],
   providers: [SubscriptionsService],
   exports: [SubscriptionsService],
 })
-export class SubscriptionsModule {}
+export class SubscriptionsModule { }

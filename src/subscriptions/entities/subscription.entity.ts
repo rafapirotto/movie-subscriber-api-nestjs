@@ -12,12 +12,13 @@ import {
 
 import { User } from 'src/users/entities/user.entity';
 import { Movie } from 'src/movies/entities/movie.entity';
+import { Location } from 'src/locations/entities/location.entity';
 import { Priority } from '../types';
 
 @Entity('subscriptions')
 // this creates the composite key userId, movieId at the database level
 // https://stackoverflow.com/questions/67197276/how-do-i-make-combination-of-3-columns-in-typeorm-postgres-unique
-@Unique(['userId', 'movieId'])
+@Unique(['userId', 'movieId', 'locationId'])
 export class Subscription {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -45,7 +46,7 @@ export class Subscription {
   priority: Priority;
 
   @Column('uuid', { name: 'user_id' })
-  public userId: string;
+  userId: string;
 
   @ManyToOne(() => User, (user) => user.subscriptions)
   // esto del @JoinColumn() se lo pongo para que no llame a la columna "userId", xq quiero los nombres snake_case
@@ -60,6 +61,13 @@ export class Subscription {
 
   @DeleteDateColumn({ name: 'available_at', nullable: true })
   availableAt?: Date;
+
+  @ManyToOne(() => Location, (location) => location.subscriptions)
+  @JoinColumn({ name: 'location_id' })
+  location: Location;
+
+  @Column({ name: 'location_id' })
+  locationId: string;
 }
 
 // Join columns are always a reference to some other columns (using a foreign key). By default your relation always refers to the primary column of the related entity. If you want to create relation with other columns of the related entity - you can specify them in @JoinColumn as well:
