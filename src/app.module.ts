@@ -40,9 +40,11 @@ import { NotificationsModule } from './notifications/notifications.module';
         // es decir, si queremos poner configService.get('algo-que-no-existe'), TS nos va a dar un error.
         // El infer: true de arriba hace que 'port' sea de type 'number' y no de type 'any'
         entities: [User, Subscription, Movie],
-        synchronize:
-          configService.get('ENV', { infer: true }) === Environments.DEV,
+        synchronize: configService.get('ENV', { infer: true }) === Environments.DEV,
         url: configService.get('DATABASE_URL', { infer: true }),
+        migrations: [__dirname + '/migrations/*.js'],
+        migrationsTableName: "migrations",
+        migrationsRun: true
       }),
       inject: [ConfigService],
     }),
@@ -50,6 +52,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     MoviesModule,
     CronjobsModule,
     NotificationsModule,
+    // CinemasModule,
   ],
   // controllers are empty because we don't have an AppController
   // controllers are always Controllers
@@ -66,4 +69,4 @@ import { NotificationsModule } from './notifications/notifications.module';
   ],
   // we only put controllers and providers that are related to the module itself
 })
-export class AppModule {}
+export class AppModule { }
