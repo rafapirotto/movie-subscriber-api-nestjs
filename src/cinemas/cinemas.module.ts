@@ -9,4 +9,4 @@ import { Cinema } from './entities/cinema.entity';
   exports: [CinemasService],
   imports: [TypeOrmModule.forFeature([Cinema])],
 })
-export class CinemasModule { }
+export class CinemasModule {}

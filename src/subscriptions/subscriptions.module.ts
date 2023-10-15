@@ -14,10 +14,10 @@ import { CinemasModule } from 'src/cinemas/cinemas.module';
     TypeOrmModule.forFeature([Subscription]),
     UsersModule,
     MoviesModule,
-    CinemasModule
+    CinemasModule,
   ],
   controllers: [SubscriptionsController],
   providers: [SubscriptionsService],
   exports: [SubscriptionsService],
 })
-export class SubscriptionsModule { }
+export class SubscriptionsModule {}

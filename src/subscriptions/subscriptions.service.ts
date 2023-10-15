@@ -31,7 +31,7 @@ export class SubscriptionsService {
     private repository: Repository<Subscription>,
     private moviesService: MoviesService,
     private cinemasService: CinemasService
-  ) { }
+  ) {}
 
   async find(
     userId: string,
@@ -47,7 +47,11 @@ export class SubscriptionsService {
 
   async add(
     { id: userId }: DecodedUser,
-    { movieId, cinemaId = DEFAULT_CINEMA.id, priority = DEFAULT_PUSHOVER_PRIORITY }: AddSubscriptionDto
+    {
+      movieId,
+      cinemaId = DEFAULT_CINEMA.id,
+      priority = DEFAULT_PUSHOVER_PRIORITY,
+    }: AddSubscriptionDto
   ): Promise<Subscription> {
     const movieExists = await this.moviesService.find(movieId);
     if (!movieExists) {
@@ -112,7 +116,10 @@ export class SubscriptionsService {
   async getAllActiveSubscriptionsByUserId({
     id: userId,
   }: DecodedUser): Promise<Array<Subscription>> {
-    return this.repository.find({ where: { userId }, relations: ['movie', 'cinema'] });
+    return this.repository.find({
+      where: { userId },
+      relations: ['movie', 'cinema'],
+    });
   }
 
   async getAllActiveSubscriptions(): Promise<Array<Subscription>> {

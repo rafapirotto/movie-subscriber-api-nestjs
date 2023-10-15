@@ -15,7 +15,7 @@ export class MoviesService {
   constructor(
     @InjectRepository(Movie)
     private repository: Repository<Movie>
-  ) { }
+  ) {}
 
   async find(id: string, withDeleted = false): Promise<Movie> {
     return this.repository.findOne({
@@ -29,11 +29,17 @@ export class MoviesService {
     await this.repository.save(movieInstance);
   }
 
-  async checkForMovieAvailability(subscription: Subscription): Promise<boolean> {
+  async checkForMovieAvailability(
+    subscription: Subscription
+  ): Promise<boolean> {
     try {
-      const response = await callWithRetry(() => fetch(buildMovieUrl(subscription.movieId)));
+      const response = await callWithRetry(() =>
+        fetch(buildMovieUrl(subscription.movieId))
+      );
       const parsedResponse = await response.json();
-      return parsedResponse?.filters?.cinemas.some((cinema) => cinema.id === subscription.cinemaId);
+      return parsedResponse?.filters?.cinemas.some(
+        (cinema) => cinema.id === subscription.cinemaId
+      );
     } catch (error) {
       return false;
     }

@@ -20,7 +20,7 @@ import { DecodedUser } from 'src/authentication/strategies/jwt.strategy';
 @UseGuards(JwtAuthGuard)
 @Controller('subscriptions')
 export class SubscriptionsController {
-  constructor(private readonly subscriptionsService: SubscriptionsService) { }
+  constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
   @Post()
   add(@Req() req: Request, @Body() addSubscriptionDto: AddSubscriptionDto) {

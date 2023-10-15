@@ -1,7 +1,8 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class updateUniqueConstraintInSubscriptionTable1697323451963 implements MigrationInterface {
-
+export class updateUniqueConstraintInSubscriptionTable1697323451963
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     const [result] = await queryRunner.query(`
       SELECT constraint_name

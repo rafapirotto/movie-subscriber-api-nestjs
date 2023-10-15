@@ -20,7 +20,7 @@ export class CronjobsService {
     private subscriptionsService: SubscriptionsService,
     private moviesService: MoviesService,
     private notificationsService: NotificationsService
-  ) { }
+  ) {}
   private readonly logger = new Logger(CronjobsService.name);
 
   private checkTicketsAvailability = (activeSubscriptions: Subscription[]) => {

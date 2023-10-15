@@ -9,11 +9,11 @@ export class CinemasService {
   constructor(
     @InjectRepository(Cinema)
     private repository: Repository<Cinema>
-  ) { }
+  ) {}
 
   async find(id: string): Promise<Cinema> {
     return this.repository.findOne({
-      where: { id }
+      where: { id },
     });
   }
 }

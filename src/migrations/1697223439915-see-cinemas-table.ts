@@ -1,7 +1,8 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class addCinemasToCinemasTable1697223439915 implements MigrationInterface {
-
+export class addCinemasToCinemasTable1697223439915
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       INSERT INTO cinemas (id, name)

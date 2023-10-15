@@ -1,7 +1,8 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class addCinemasToExistingSubscriptions1697225207160 implements MigrationInterface {
-
+export class addCinemasToExistingSubscriptions1697225207160
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       UPDATE subscriptions
