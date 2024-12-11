@@ -110,7 +110,7 @@ export class CronjobsService {
 
     try {
       const containsKeyword = await checkWebsite(url, keywords);
-      if (!containsKeyword) {
+      if (containsKeyword) {
         this.logger.log(
           'The website contains some of the keywords, sending notification...'
         );
