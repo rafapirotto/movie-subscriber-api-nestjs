@@ -14,6 +14,22 @@ export type AvailableSubscription = Subscription & {
   isMovieAvailable: boolean;
 };
 
+async function checkWebsite(url: string, keywords: string[]): Promise<boolean> {
+  try {
+    const { data: webpage } = await axios.get(url);
+    const parsedWebpage = parse(webpage);
+    const textContent = parsedWebpage.text;
+
+    const lowerCaseContent = textContent.toLowerCase();
+    return keywords.some((keyword) =>
+      lowerCaseContent.includes(keyword.toLowerCase())
+    );
+  } catch (error) {
+    console.log(`Error fetching the website: ${error.message}`);
+    return false;
+  }
+}
+
 @Injectable()
 export class CronjobsService {
   constructor(
@@ -80,5 +96,35 @@ export class CronjobsService {
       timeZone: 'America/Montevideo',
     });
     this.logger.log(`Checked for movies at ${now}`);
+  }
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async checkForInterstellar() {
+    const url = 'https://www.voyalcine.net/showcase/';
+    const keywords = [
+      'Interstellar',
+      'Interstelar',
+      'Interestelar',
+      'Interestellar',
+    ];
+
+    try {
+      const containsKeyword = await checkWebsite(url, keywords);
+      if (!containsKeyword) {
+        this.logger.log(
+          'The website contains some of the keywords, sending notification...'
+        );
+        await this.notificationsService.send(
+          'Tickets for Interstellar are ready in Buenos Aires',
+          'Tickets for Interstellar are ready in Buenos Aires',
+          Priority.EMERGENCY,
+          PushoverDevice.IPHONE_RAFA
+        );
+      } else {
+        this.logger.log('The website does not contain any of the keywords.');
+      }
+    } catch (error) {
+      this.logger.log(`Error: ${error.message}`);
+    }
   }
 }
