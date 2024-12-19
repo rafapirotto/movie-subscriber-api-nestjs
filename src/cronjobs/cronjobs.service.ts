@@ -1,37 +1,37 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { parse } from 'node-html-parser';
-import axios from 'axios';
+// import { parse } from 'node-html-parser';
+// import axios from 'axios';
 
 import { MoviesService } from 'src/movies/movies.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { PushoverDevice } from 'src/notifications/types';
 import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 import { SubscriptionsService } from 'src/subscriptions/subscriptions.service';
-import { Priority } from 'src/subscriptions/types';
+// import { Priority } from 'src/subscriptions/types';
 
 export type AvailableSubscription = Subscription & {
   isMovieAvailable: boolean;
 };
 
-function containsKeyword(data, keyword) {
-  // Extract the "days" object
-  const days = data.days;
+// function containsKeyword(data, keyword) {
+//   // Extract the "days" object
+//   const days = data.days;
 
-  // Check if the specific date "2025-01-11" exists in the "days" object
-  if (days['2025-01-11']) {
-    // Iterate through each location on the specific date
-    for (const location of days['2025-01-11']) {
-      // Check if the "name" property contains the keyword
-      if (location.name.toLowerCase().includes(keyword.toLowerCase())) {
-        return true; // Return true if the keyword is found
-      }
-    }
-  }
+//   // Check if the specific date "2025-01-11" exists in the "days" object
+//   if (days['2025-01-11']) {
+//     // Iterate through each location on the specific date
+//     for (const location of days['2025-01-11']) {
+//       // Check if the "name" property contains the keyword
+//       if (location.name.toLowerCase().includes(keyword.toLowerCase())) {
+//         return true; // Return true if the keyword is found
+//       }
+//     }
+//   }
 
-  // If the specific date doesn't exist or the keyword wasn't found
-  return false;
-}
+//   // If the specific date doesn't exist or the keyword wasn't found
+//   return false;
+// }
 
 @Injectable()
 export class CronjobsService {
@@ -101,29 +101,29 @@ export class CronjobsService {
     this.logger.log(`Checked for movies at ${now}`);
   }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
-  async checkForInterstellar() {
-    try {
-      const keyword = 'IMAX Theatre (Norcenter)';
-      const url = 'https://api.voyalcine.net/films/4126/tree/showcase';
-      const response = await fetch(url);
-      const data = await response.json();
+  // @Cron(CronExpression.EVERY_5_MINUTES)
+  // async checkForInterstellar() {
+  //   try {
+  //     const keyword = 'IMAX Theatre (Norcenter)';
+  //     const url = 'https://api.voyalcine.net/films/4126/tree/showcase';
+  //     const response = await fetch(url);
+  //     const data = await response.json();
 
-      if (containsKeyword(data, keyword)) {
-        this.logger.log(
-          'The website contains some of the keywords, sending notification...'
-        );
-        await this.notificationsService.send(
-          'Tickets for Interstellar are ready in Buenos Aires',
-          'Tickets for Interstellar are ready in Buenos Aires',
-          Priority.EMERGENCY,
-          PushoverDevice.IPHONE_RAFA
-        );
-      } else {
-        this.logger.log('The website does not contain any of the keywords.');
-      }
-    } catch (error) {
-      this.logger.log(`Error: ${error.message}`);
-    }
-  }
+  //     if (containsKeyword(data, keyword)) {
+  //       this.logger.log(
+  //         'The website contains some of the keywords, sending notification...'
+  //       );
+  //       await this.notificationsService.send(
+  //         'Tickets for Interstellar are ready in Buenos Aires',
+  //         'Tickets for Interstellar are ready in Buenos Aires',
+  //         Priority.EMERGENCY,
+  //         PushoverDevice.IPHONE_RAFA
+  //       );
+  //     } else {
+  //       this.logger.log('The website does not contain any of the keywords.');
+  //     }
+  //   } catch (error) {
+  //     this.logger.log(`Error: ${error.message}`);
+  //   }
+  // }
 }
