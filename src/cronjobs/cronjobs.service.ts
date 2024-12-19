@@ -14,20 +14,23 @@ export type AvailableSubscription = Subscription & {
   isMovieAvailable: boolean;
 };
 
-async function checkWebsite(url: string, keywords: string[]): Promise<boolean> {
-  try {
-    const { data: webpage } = await axios.get(url);
-    const parsedWebpage = parse(webpage);
-    const textContent = parsedWebpage.text;
+function containsKeyword(data, keyword) {
+  // Extract the "days" object
+  const days = data.days;
 
-    const lowerCaseContent = textContent.toLowerCase();
-    return keywords.some((keyword) =>
-      lowerCaseContent.includes(keyword.toLowerCase())
-    );
-  } catch (error) {
-    console.log(`Error fetching the website: ${error.message}`);
-    return false;
+  // Check if the specific date "2025-01-11" exists in the "days" object
+  if (days['2025-01-11']) {
+    // Iterate through each location on the specific date
+    for (const location of days['2025-01-11']) {
+      // Check if the "name" property contains the keyword
+      if (location.name.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; // Return true if the keyword is found
+      }
+    }
   }
+
+  // If the specific date doesn't exist or the keyword wasn't found
+  return false;
 }
 
 @Injectable()
@@ -100,17 +103,13 @@ export class CronjobsService {
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   async checkForInterstellar() {
-    const url = 'https://www.voyalcine.net/showcase/';
-    const keywords = [
-      'Interstellar',
-      'Interstelar',
-      'Interestelar',
-      'Interestellar',
-    ];
-
     try {
-      const containsKeyword = await checkWebsite(url, keywords);
-      if (containsKeyword) {
+      const keyword = 'IMAX Theatre (Norcenter)';
+      const url = 'https://api.voyalcine.net/films/4126/tree/showcase';
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (containsKeyword(data, keyword)) {
         this.logger.log(
           'The website contains some of the keywords, sending notification...'
         );
